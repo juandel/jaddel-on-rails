@@ -1,0 +1,81 @@
+class PagesController < ApplicationController
+	layout 'admin'	
+
+	before_filter :confirm_logged_in, :only => [:index, :menu]
+	before_filter :find_subject
+
+	def index
+		list
+		render('list')	
+	end
+	def list
+		@pages = Page.sorted.where(:subject_id => @subject.id)
+	end
+	def show
+		@page = Page.find(params[:id])
+	end
+	def new
+		@page = Page.new(:subject_id => @subject.id)
+		@page_count = @subject.pages.size + 1
+		@subjects = Subject.order('position ASC')
+	end
+	def create
+		new_position = params [:page].delete(:position) 
+		#instantiate a new object using form parameters
+		@page = Page.new (params[:page])
+		#Save object
+		if @page.save
+			@page.move_to_position(new_position)
+			# If save succeeds, redirect to the list action
+			flash[:notice] = "Page "+@page.name+" Created."
+			redirect_to(:action => 'list', :subject_id => @page.subject_id)
+		else
+			#If save fails, redisplay the form so user can fix the problems
+			@page_count = @subject.pages.size + 1
+			@subjects = Subject.order('position ASC')
+			render('new')
+		end
+	end
+	def edit
+		@page = Page.find(params[:id])
+		@page_count = @subject.pages.size
+		@subjects  = Subject.order('position ASC')
+	end
+	def update
+		#Find a new object using form parameters
+		@page = Page.find(params[:id])
+		new_position = params [:page].delete(:position) 
+		#Update object
+		if @page.update_attributes(params[:page])
+			@page.move_to_position(new_position)
+			# If update succeeds, redirect to the list action
+			flash[:notice] = "Page "+@page.name+" Updated."
+			redirect_to(:action => 'show', :id => @page.id, :subject_id => @page.subject_id)
+		else
+			#If save fails, redisplay the form so user can fix the problems
+			@subjects = Subject.order('position ASC')
+			@page_count = @subject.pages.size
+			render('edit')
+		end
+	end
+	def delete
+		@page = Page.find(params[:id])
+	end
+	def destroy
+		page = Page.find(params[:id])
+		page.move_to_position(nil)
+		page.destroy
+		flash[:notice] = "Page "+@page.name+" Deleted."
+		redirect_to(:action => 'list', :subject_id => @subject.id)
+	end
+
+	private
+	
+	def find_subject
+		if params[:subject_id]
+			@subject = Subject.find_by_id(params[:subject_id])
+		end
+
+		
+	end
+end

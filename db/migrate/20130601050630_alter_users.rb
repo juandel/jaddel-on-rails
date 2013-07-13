@@ -18,3 +18,4 @@ class AlterUsers < ActiveRecord::Migration
   	rename_table("admin_users", "users")
   end
 end
+

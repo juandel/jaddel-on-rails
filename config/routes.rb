@@ -1,6 +1,17 @@
 Jaddel::Application.routes.draw do
+
+  get "admin_users/list"
+
+  get "admin_users/new"
+
+  get "admin_users/edit"
+
+  get "admin_users/delete"
+
   #get "demo/index"
   root :to => "demo#index"
+
+  match 'admin', :to => 'access#menu'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

@@ -1,0 +1,15 @@
+-@page_title = "Admin Menu" 
+
+.menu
+	%h2 Admin Menu
+	.identity 
+	L ogged in as:  
+	= session[:username]
+	%ul
+		%li
+			= link_to "Manage Content", {:controller => 'subjects'} 
+		%li
+			= link_to "Manage Admin Users", {:controller => 'admin_users'} 
+		%li
+			= link_to "logout", {:controller => 'logout'} 
+
